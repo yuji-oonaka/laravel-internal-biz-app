@@ -37,46 +37,48 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $request->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        {{ $request->status->name }} {{-- Enum想定 --}}
+                                        {{-- name ではなく追加した label() を使って日本語表示にします --}}
+                                        {{ $request->status->label() }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->created_at->format('Y-m-d H:i') }}</td>
-                                <td class="px-6 py-4">
-                                    @can('view', $request)
-                                    <a href="#" class="text-blue-600">詳細</a>
-                                    @endcan
 
-                                    @can('update', $request)
-                                    <a href="#" class="text-green-600 ml-2">編集</a>
-                                    @endcan
-                                </td>
+                                {{-- アクション列を1つに統合 --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    @can('view', $request)
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">詳細</a>
-                                    @endcan
+                                    <div class="flex justify-end items-center space-x-3">
+                                        {{-- 詳細リンク: href="#" を route() に修正 --}}
+                                        @can('view', $request)
+                                        <a href="{{ route('requests.show', $request->id) }}" class="text-indigo-600 hover:text-indigo-900">詳細</a>
+                                        @endcan
 
-                                    {{-- 承認ボタン --}}
-                                    @can('approve', $request)
-                                    <form action="{{ route('requests.approve', $request->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-green-600 hover:text-green-900 mr-3" onclick="return confirm('承認してもよろしいですか？')">
-                                            承認
-                                        </button>
-                                    </form>
-                                    @endcan
+                                        {{-- 編集リンク（必要な場合） --}}
+                                        @can('update', $request)
+                                        <a href="#" class="text-green-600 hover:text-green-900">編集</a>
+                                        @endcan
 
-                                    {{-- 却下ボタン --}}
-                                    @can('reject', $request)
-                                    <form action="{{ route('requests.reject', $request->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('却下してもよろしいですか？')">
-                                            却下
-                                        </button>
-                                    </form>
-                                    @endcan
+                                        {{-- 承認ボタン --}}
+                                        @can('approve', $request)
+                                        <form action="{{ route('requests.approve', $request->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="text-green-600 hover:text-green-900 font-bold" onclick="return confirm('承認してもよろしいですか？')">
+                                                承認
+                                            </button>
+                                        </form>
+                                        @endcan
+
+                                        {{-- 却下ボタン --}}
+                                        @can('reject', $request)
+                                        <form action="{{ route('requests.reject', $request->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="text-red-600 hover:text-red-900 font-bold" onclick="return confirm('却下してもよろしいですか？')">
+                                                却下
+                                            </button>
+                                        </form>
+                                        @endcan
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

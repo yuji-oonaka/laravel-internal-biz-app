@@ -7,12 +7,13 @@ use App\Models\Request;
 use Illuminate\Database\Eloquent\Collection;
 use App\Enums\RequestStatus;
 use Carbon\Carbon;
+use App\Notifications\RequestStatusChanged;
 
 class RequestService
 {
     // Repository Interface をインジェクション
     public function __construct(
-        protected RequestRepositoryInterface $requestRepository
+        protected RequestRepositoryInterface $requestRepository // ここで型として使用
     ) {}
 
     /**
@@ -30,8 +31,7 @@ class RequestService
     public function createRequest(int $userId, array $data): Request
     {
         $data['user_id'] = $userId;
-        // ステータスはマイグレーションで 'draft' がデフォルトだが、
-        // ビジネスルールとしてここで明示的に設定する場合もある
+        $data['status'] = RequestStatus::PENDING; // 一時的に DRAFT ではなく PENDING にする
         return $this->requestRepository->store($data);
     }
 
@@ -42,16 +42,23 @@ class RequestService
     {
         $request = $this->requestRepository->findById($requestId);
 
-        // ビジネスルール: 申請中(PENDING)のものだけ承認可能
         if (!$request || $request->status !== RequestStatus::PENDING) {
             return false;
         }
 
-        return $this->requestRepository->updateStatus($requestId, [
+        // 変数 $result に戻り値を代入するように修正
+        $result = $this->requestRepository->updateStatus($requestId, [
             'status' => RequestStatus::APPROVED,
             'approved_by' => $adminId,
             'approved_at' => Carbon::now(),
         ]);
+
+        if ($result) {
+            // 申請者に通知を送信
+            $request->user->notify(new RequestStatusChanged($request));
+        }
+
+        return $result;
     }
 
     /**
@@ -65,11 +72,18 @@ class RequestService
             return false;
         }
 
-        return $this->requestRepository->updateStatus($requestId, [
+        // 変数 $result に戻り値を代入
+        $result = $this->requestRepository->updateStatus($requestId, [
             'status' => RequestStatus::REJECTED,
             'approved_by' => $adminId,
             'approved_at' => Carbon::now(),
         ]);
+
+        if ($result) {
+            $request->user->notify(new RequestStatusChanged($request));
+        }
+
+        return $result;
     }
 
     public function getRequestById(int $id): ?\App\Models\Request
