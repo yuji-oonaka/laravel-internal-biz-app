@@ -46,6 +46,15 @@ class RequestController extends Controller
     }
 
     /**
+     * 新規作成画面を表示
+     */
+    public function create()
+    {
+        // resources/views/requests/create.blade.php を表示する
+        return view('requests.create');
+    }
+
+    /**
      * 承認処理
      */
     public function approve(int $id)
