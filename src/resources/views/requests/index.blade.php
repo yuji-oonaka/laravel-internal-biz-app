@@ -42,6 +42,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->created_at->format('Y-m-d H:i') }}</td>
+                                <td class="px-6 py-4">
+                                    @can('view', $request)
+                                    <a href="#" class="text-blue-600">詳細</a>
+                                    @endcan
+
+                                    @can('update', $request)
+                                    <a href="#" class="text-green-600 ml-2">編集</a>
+                                    @endcan
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

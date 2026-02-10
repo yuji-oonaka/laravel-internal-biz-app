@@ -4,44 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequestRequest;
 use App\Services\RequestService;
-use Illuminate\Http\Request;
+use App\Models\Request;
+use App\Models\User; // 追加
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class RequestController extends Controller
 {
-    public function __construct(
-        protected RequestService $requestService
-    ) {}
+    use AuthorizesRequests;
 
-    /**
-     * 一覧表示
-     */
+    // Intelephenseのためにプロパティを明示的に宣言
+    protected RequestService $requestService;
+
+    public function __construct(RequestService $requestService)
+    {
+        $this->requestService = $requestService;
+    }
+
     public function index()
     {
-        $requests = $this->requestService->getAllRequests();
+        /** @var User $user */
+        $user = Auth::user(); // auth()->user() より Auth::user() の方が型認識されやすい
+
+        // 管理者は全件、一般社員は自分の分のみ
+        $requests = $user->isAdmin()
+            ? $this->requestService->getAllRequests()
+            : $user->requests; // 後述するUserモデルへのリレーション追加が必要
+
         return view('requests.index', compact('requests'));
     }
 
-    /**
-     * 作成画面
-     */
-    public function create()
-    {
-        return view('requests.create');
-    }
-
-    /**
-     * 保存処理
-     */
     public function store(StoreRequestRequest $request)
     {
-        // バリデーション済みデータの取得
-        $validated = $request->validated();
+        // $this->authorize('create', Request::class); // Policy未定義メソッドならコメントアウト
 
-        // ログインユーザーIDと共にサービスへ渡す
-        $this->requestService->createRequest(Auth::id(), $validated);
+        // auth()->id() の代わりに Auth::id() を使用
+        $this->requestService->createRequest(Auth::id(), $request->validated());
 
-        return redirect()->route('requests.index')
-            ->with('status', '申請を保存しました。');
+        return redirect()->route('requests.index')->with('status', '申請を作成しました。');
     }
 }
