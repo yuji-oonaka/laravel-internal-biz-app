@@ -54,6 +54,22 @@ class RequestController extends Controller
         return view('requests.create');
     }
 
+    public function show(int $id)
+    {
+        // 変数名を $requestModel から $request に変更します
+        $request = $this->requestService->getRequestById($id);
+
+        if (!$request) {
+            abort(404);
+        }
+
+        // 認可チェックも $request を使用
+        $this->authorize('view', $request);
+
+        // これで compact('request') が正常に動作します
+        return view('requests.show', compact('request'));
+    }
+
     /**
      * 承認処理
      */

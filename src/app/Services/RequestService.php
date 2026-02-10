@@ -31,8 +31,7 @@ class RequestService
     public function createRequest(int $userId, array $data): Request
     {
         $data['user_id'] = $userId;
-        // ステータスはマイグレーションで 'draft' がデフォルトだが、
-        // ビジネスルールとしてここで明示的に設定する場合もある
+        $data['status'] = RequestStatus::PENDING; // 一時的に DRAFT ではなく PENDING にする
         return $this->requestRepository->store($data);
     }
 
