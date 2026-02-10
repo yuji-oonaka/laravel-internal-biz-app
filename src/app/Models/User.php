@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Enums\UserRole;
+use App\Models\Request as WorkRequest; // クラス名の重複を避ける
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -55,5 +57,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === UserRole::ADMIN;
+    }
+
+    /**
+     * ユーザーが持つ申請一覧
+     */
+    public function requests(): HasMany
+    {
+        return $this->hasMany(WorkRequest::class);
     }
 }
