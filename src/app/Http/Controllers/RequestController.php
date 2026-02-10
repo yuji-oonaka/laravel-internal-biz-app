@@ -50,13 +50,12 @@ class RequestController extends Controller
      */
     public function approve(int $id)
     {
-        // Policyで管理者権限をチェック（後ほどPolicyに定義）
-        $this->authorize('admin-only');
+        $requestModel = $this->requestService->getRequestById($id); // ServiceにfindById相当のメソッドが必要
+        $this->authorize('approve', $requestModel);
 
         if ($this->requestService->approveRequest($id, Auth::id())) {
             return back()->with('status', '申請を承認しました。');
         }
-
         return back()->withErrors('承認処理に失敗しました。');
     }
 
@@ -65,12 +64,12 @@ class RequestController extends Controller
      */
     public function reject(int $id)
     {
-        $this->authorize('admin-only');
+        $requestModel = $this->requestService->getRequestById($id);
+        $this->authorize('reject', $requestModel);
 
         if ($this->requestService->rejectRequest($id, Auth::id())) {
             return back()->with('status', '申請を却下しました。');
         }
-
         return back()->withErrors('却下処理に失敗しました。');
     }
 }

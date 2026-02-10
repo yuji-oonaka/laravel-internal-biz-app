@@ -51,6 +51,33 @@
                                     <a href="#" class="text-green-600 ml-2">編集</a>
                                     @endcan
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    @can('view', $request)
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">詳細</a>
+                                    @endcan
+
+                                    {{-- 承認ボタン --}}
+                                    @can('approve', $request)
+                                    <form action="{{ route('requests.approve', $request->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-green-600 hover:text-green-900 mr-3" onclick="return confirm('承認してもよろしいですか？')">
+                                            承認
+                                        </button>
+                                    </form>
+                                    @endcan
+
+                                    {{-- 却下ボタン --}}
+                                    @can('reject', $request)
+                                    <form action="{{ route('requests.reject', $request->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('却下してもよろしいですか？')">
+                                            却下
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

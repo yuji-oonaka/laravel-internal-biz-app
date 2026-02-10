@@ -71,4 +71,9 @@ class RequestService
             'approved_at' => Carbon::now(),
         ]);
     }
+
+    public function getRequestById(int $id): ?\App\Models\Request
+    {
+        return $this->requestRepository->findById($id);
+    }
 }

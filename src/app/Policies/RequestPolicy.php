@@ -35,4 +35,21 @@ class RequestPolicy
         // (管理者は承認・却下はするが、内容の直接編集はさせない設計)
         return $user->id === $request->user_id && $request->status->name === 'DRAFT';
     }
+
+    /**
+     * 承認権限の判定
+     */
+    public function approve(User $user, Request $request): bool
+    {
+        // 管理者であること、かつ申請が「申請中」状態であること
+        return $user->role === UserRole::ADMIN && $request->status->name === 'PENDING';
+    }
+
+    /**
+     * 却下権限の判定
+     */
+    public function reject(User $user, Request $request): bool
+    {
+        return $user->role === UserRole::ADMIN && $request->status->name === 'PENDING';
+    }
 }
