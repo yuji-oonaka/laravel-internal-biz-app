@@ -26,4 +26,6 @@ interface RequestRepositoryInterface
      * 申請の更新
      */
     public function update(int $id, array $data): bool;
+
+    public function updateStatus(int $id, array $attributes): bool;
 }

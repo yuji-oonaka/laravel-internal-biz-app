@@ -30,4 +30,13 @@ class RequestRepository implements RequestRepositoryInterface
         }
         return $request->update($data);
     }
+
+    public function updateStatus(int $id, array $attributes): bool
+    {
+        $request = $this->findById($id);
+        if (!$request) {
+            return false;
+        }
+        return $request->update($attributes);
+    }
 }

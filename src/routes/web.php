@@ -25,6 +25,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [RequestController::class, 'index'])->name('index');
         Route::get('/create', [RequestController::class, 'create'])->name('create');
         Route::post('/', [RequestController::class, 'store'])->name('store');
+        // 管理者用アクション
+        Route::patch('/{id}/approve', [RequestController::class, 'approve'])->name('approve');
+        Route::patch('/{id}/reject', [RequestController::class, 'reject'])->name('reject');
     });
 });
 

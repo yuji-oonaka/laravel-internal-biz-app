@@ -44,4 +44,33 @@ class RequestController extends Controller
 
         return redirect()->route('requests.index')->with('status', '申請を作成しました。');
     }
+
+    /**
+     * 承認処理
+     */
+    public function approve(int $id)
+    {
+        // Policyで管理者権限をチェック（後ほどPolicyに定義）
+        $this->authorize('admin-only');
+
+        if ($this->requestService->approveRequest($id, Auth::id())) {
+            return back()->with('status', '申請を承認しました。');
+        }
+
+        return back()->withErrors('承認処理に失敗しました。');
+    }
+
+    /**
+     * 却下処理
+     */
+    public function reject(int $id)
+    {
+        $this->authorize('admin-only');
+
+        if ($this->requestService->rejectRequest($id, Auth::id())) {
+            return back()->with('status', '申請を却下しました。');
+        }
+
+        return back()->withErrors('却下処理に失敗しました。');
+    }
 }
