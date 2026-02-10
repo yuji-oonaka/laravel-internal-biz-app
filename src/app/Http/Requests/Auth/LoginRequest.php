@@ -49,6 +49,14 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // ログイン成功直後に有効フラグをチェック
+        if (! Auth::user()->is_active) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => 'このアカウントは現在無効です。管理者に連絡してください。',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
