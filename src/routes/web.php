@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RequestController; // 追加
+use App\Http\Controllers\RequestController; // ← これが絶対に必要です！
+use App\Http\Controllers\NotificationController; // ついでに次で使うこれも追加
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware('auth')->group(function () {
         // 管理者用アクション
         Route::patch('/{id}/approve', [RequestController::class, 'approve'])->name('approve');
         Route::patch('/{id}/reject', [RequestController::class, 'reject'])->name('reject');
+    });
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::patch('/{id}/read', [App\Http\Controllers\NotificationController::class, 'read'])->name('read');
     });
 });
 
