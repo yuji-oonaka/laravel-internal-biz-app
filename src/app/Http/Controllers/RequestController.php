@@ -22,15 +22,21 @@ class RequestController extends Controller
         $this->requestService = $requestService;
     }
 
-    public function index()
+    public function index(HttpRequest $httpRequest)
     {
-        /** @var User $user */
-        $user = Auth::user(); // auth()->user() より Auth::user() の方が型認識されやすい
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-        // 管理者は全件、一般社員は自分の分のみ
-        $requests = $user->isAdmin()
-            ? $this->requestService->getAllRequests()
-            : $user->requests; // 後述するUserモデルへのリレーション追加が必要
+        // 検索条件（ステータスなど）を取得
+        $filters = $httpRequest->only(['status']);
+
+        // 【重要】管理者でない場合は、強制的に自分のIDをフィルターにセットする
+        if (!$user->isAdmin()) {
+            $filters['user_id'] = $user->id;
+        }
+
+        // 全ての取得ロジックをサービスに任せる
+        $requests = $this->requestService->getAllRequests($filters);
 
         return view('requests.index', compact('requests'));
     }
