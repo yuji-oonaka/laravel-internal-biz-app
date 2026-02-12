@@ -4,15 +4,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestController; // ← これが絶対に必要です！
 use App\Http\Controllers\NotificationController; // ついでに次で使うこれも追加
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Breeze標準のダッシュボード
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // 認証が必要なルート
 Route::middleware('auth')->group(function () {
@@ -35,6 +35,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
         Route::patch('/{id}/read', [App\Http\Controllers\NotificationController::class, 'read'])->name('read');
     });
+});
+
+Route::middleware(['auth', 'can:admin-only'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::patch('/users/{user}/toggle', [UserController::class, 'toggleActive'])->name('users.toggle');
 });
 
 require __DIR__ . '/auth.php';

@@ -17,6 +17,25 @@
                 {{ session('status') }}
             </div>
             @endif
+            <div class="mb-6 bg-white p-4 rounded shadow-sm">
+                <form action="{{ route('requests.index') }}" method="GET" class="flex items-end gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">ステータス</label>
+                        <select name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">すべて</option>
+                            @foreach(App\Enums\RequestStatus::cases() as $status)
+                            <option value="{{ $status->value }}" {{ request('status') == $status->value ? 'selected' : '' }}>
+                                {{ $status->label() }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <x-primary-button>
+                        検索
+                    </x-primary-button>
+                    <a href="{{ route('requests.index') }}" class="text-sm text-gray-600 hover:underline pb-2">リセット</a>
+                </form>
+            </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -84,6 +103,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        {{ $requests->links() }}
+                    </div>
                 </div>
             </div>
         </div>

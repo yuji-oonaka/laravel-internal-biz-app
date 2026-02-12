@@ -19,6 +19,12 @@
                         {{ __('申請一覧') }}
                     </x-nav-link>
 
+                    @can('admin-only')
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        {{ __('ユーザー管理') }}
+                    </x-nav-link>
+                    @endcan
+
                     <x-nav-link href="#" class="relative">
                         {{ __('通知') }}
                         @if (auth()->user()->unreadNotifications->count() > 0)

@@ -4,12 +4,26 @@ namespace App\Repositories;
 
 use App\Models\Request;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class RequestRepository implements RequestRepositoryInterface
 {
-    public function all(): Collection
+    public function all(array $filters = []): LengthAwarePaginator
     {
-        return Request::with('user')->get();
+        $query = Request::with('user');
+
+        // ステータスで絞り込み
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // ユーザーIDで絞り込み（自分の申請のみ表示用など）
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
+        // 最新順で、1ページ10件取得
+        return $query->latest()->paginate(10);
     }
 
     public function findById(int $id): ?Request

@@ -4,13 +4,14 @@ namespace App\Repositories;
 
 use App\Models\Request;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface RequestRepositoryInterface
 {
     /**
-     * 全件取得（実務では必要に応じてページネーションに変更）
+     * 条件付きで全件取得
      */
-    public function all(): Collection;
+    public function all(array $filters = []): LengthAwarePaginator;
 
     /**
      * 特定のIDで1件取得
@@ -28,4 +29,6 @@ interface RequestRepositoryInterface
     public function update(int $id, array $data): bool;
 
     public function updateStatus(int $id, array $attributes): bool;
+
+    
 }
