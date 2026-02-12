@@ -10,10 +10,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Breeze標準のダッシュボード
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // 認証が必要なルート
 Route::middleware('auth')->group(function () {

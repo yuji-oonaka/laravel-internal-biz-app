@@ -36,7 +36,7 @@ class RequestController extends Controller
         }
 
         // 全ての取得ロジックをサービスに任せる
-        $requests = $this->requestService->getAllRequests($filters);
+        $requests = $this->requestService->getAllRequests($filters)->withQueryString();
 
         return view('requests.index', compact('requests'));
     }

@@ -89,4 +89,23 @@ class RequestService
     {
         return $this->requestRepository->findById($id);
     }
+
+    /**
+     * ダッシュボード用の統計情報を取得
+     */
+    public function getDashboardStats(int $userId, bool $isAdmin): array
+    {
+        if ($isAdmin) {
+            // 管理者の場合：システム全体の「申請中（承認待ち）」件数
+            return [
+                'pending_count' => $this->requestRepository->all(['status' => RequestStatus::PENDING->value])->total(),
+            ];
+        }
+
+        // 一般ユーザーの場合：自分の「下書き」と「承認済み」などの件数
+        return [
+            'draft_count'   => $this->requestRepository->all(['user_id' => $userId, 'status' => RequestStatus::DRAFT->value])->total(),
+            'pending_count' => $this->requestRepository->all(['user_id' => $userId, 'status' => RequestStatus::PENDING->value])->total(),
+        ];
+    }
 }
