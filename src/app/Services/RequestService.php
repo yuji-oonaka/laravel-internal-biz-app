@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Repositories\RequestRepositoryInterface;
 use App\Models\Request;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use App\Enums\RequestStatus;
 use Carbon\Carbon;
 use App\Notifications\RequestStatusChanged;
@@ -19,11 +19,10 @@ class RequestService
     /**
      * 申請一覧の取得ロジック
      */
-    public function getAllRequests(): Collection
+    public function getAllRequests(array $filters = []): LengthAwarePaginator
     {
-        // 修正前: return $this->requestRepository::all();
-        // 修正後: アロー演算子を使用
-        return $this->requestRepository->all();
+        // リポジトリの all() は既に Paginator を返すようになっているので、そのまま返せばOK
+        return $this->requestRepository->all($filters);
     }
     /**
      * 申請作成ロジック
